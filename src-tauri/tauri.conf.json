@@ -17,7 +17,7 @@
         "height": 800,
         "decorations": false,
         "transparent": true,
-        "resizable": false,
+        "resizable": true,
         "windowEffects": {
           "effects": ["mica"]
         }

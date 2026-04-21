@@ -87,14 +87,14 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
     }
 
     return (
-        <div className={`flex items-center gap-4 p-3 rounded-lg border transition-colors overflow-hidden ${
+        <div className={`flex items-center gap-4 p-3 rounded-lg border transition-colors overflow-hidden max-sm:gap-2 max-sm:p-2 ${
             isRunning 
                 ? "border-green-500/50 bg-green-500/10 hover:bg-green-500/15" 
                 : isFavorite
                     ? "border-yellow-500/50 bg-yellow-500/17 hover:bg-yellow-500/25"
                     : "border-border/50 bg-card/50 backdrop-blur-sm hover:bg-accent/30"
         }`}>
-            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted/50">
+            <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-muted/50 max-sm:h-11 max-sm:w-11">
                 <img
                     src={getGameIconUrl(game, 128)}
                     alt={game.name}
@@ -112,9 +112,9 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
 
             <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-2 min-w-0">
-                    <h3 className="font-medium text-foreground truncate min-w-0">{game.name}</h3>
+                    <h3 className="font-medium text-foreground truncate min-w-0 max-sm:text-sm">{game.name}</h3>
                     {isRunning && (
-                        <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500 font-medium whitespace-nowrap shrink-0">
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/20 text-green-500 font-medium whitespace-nowrap shrink-0 max-sm:text-[10px] max-sm:px-1">
                             {formatElapsedTime(elapsed)}
                         </span>
                     )}
@@ -144,7 +144,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                         </Tooltip>
                     </TooltipProvider>
                 </div>
-                <span className="text-xs text-muted-foreground font-mono">{t("gameCard.id")}: {game.id}</span>
+                <span className="block truncate max-w-full text-xs text-muted-foreground font-mono max-sm:text-[10px]">{t("gameCard.id")}: {game.id}</span>
                 {isRunning && (
                     <div className="mt-1.5 flex items-center gap-2">
                         <div className="flex-1 h-1.5 rounded-full bg-muted/50 overflow-hidden">
@@ -155,7 +155,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                                 style={{ width: `${progress}%` }}
                             />
                         </div>
-                        <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0">
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0 max-sm:hidden">
                             {formatElapsedTime(elapsed)} / 15:00
                         </span>
                     </div>
@@ -168,7 +168,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                         <Button
                             size="icon"
                             variant="ghost"
-                            className="shrink-0 h-8 w-8"
+                            className="shrink-0 h-8 w-8 max-sm:h-7 max-sm:w-7"
                             onClick={() => onToggleFavorite(game.id)}
                         >
                             <Star
@@ -190,7 +190,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                 <Button
                     size="sm"
                     onClick={handleClick}
-                    className={`shrink-0 ${!isRunning && hasMultipleExecutables ? "rounded-r-none" : ""}`}
+                    className={`shrink-0 max-sm:h-8 max-sm:px-2 ${!isRunning && hasMultipleExecutables ? "rounded-r-none" : ""}`}
                     variant={isRunning ? "destructive" : "default"}
                     disabled={isLoading}
                 >
@@ -201,7 +201,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                     ) : (
                         <Play className="h-4 w-4 mr-1.5" />
                     )}
-                    {isRunning ? t("actions.stop") : t("actions.run")}
+                    <span className="max-[420px]:hidden">{isRunning ? t("actions.stop") : t("actions.run")}</span>
                 </Button>
                 {!isRunning && hasMultipleExecutables && (
                     <DropdownMenu>
@@ -209,7 +209,7 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
                             <Button
                                 size="sm"
                                 variant="default"
-                                className="rounded-l-none border-l border-l-primary-foreground/20 px-1.5"
+                                className="rounded-l-none border-l border-l-primary-foreground/20 px-1.5 max-sm:h-8"
                                 disabled={isLoading}
                             >
                                 <ChevronDown className="h-4 w-4" />

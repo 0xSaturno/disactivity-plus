@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { invoke } from "@tauri-apps/api/core"
@@ -89,30 +87,34 @@ export default function GameLauncher() {
         fetchFavorites().catch(console.error)
     }, [])
 
-    const handleSearch = () => {
-        const query = searchQuery.toLowerCase().trim()
+    useEffect(() => {
+        const terms = searchQuery
+            .toLowerCase()
+            .split(",")
+            .map((term) => term.trim())
+            .filter(Boolean)
+
         setCurrentPage(1)
-        if (!query) {
+
+        if (terms.length === 0) {
             setFilteredGames(games)
             return
         }
+
         const results = games.filter((game) => {
-            // Search by name
-            if (game.name.toLowerCase().includes(query)) return true
-            // Search by ID
-            if (game.id.toLowerCase().includes(query)) return true
-            // Search by aliases
-            return !!game.aliases?.some((alias) => alias.toLowerCase().includes(query));
+            const gameName = game.name.toLowerCase()
+            const gameId = game.id.toLowerCase()
+            const gameAliases = game.aliases?.map((alias) => alias.toLowerCase()) || []
 
+            return terms.some((term) => {
+                if (gameName.includes(term)) return true
+                if (gameId.includes(term)) return true
+                return gameAliases.some((alias) => alias.includes(term))
+            })
         })
-        setFilteredGames(results)
-    }
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
-            handleSearch()
-        }
-    }
+        setFilteredGames(results)
+    }, [searchQuery, games])
 
     const handleRefresh = () => {
         setSearchQuery("")
@@ -268,11 +270,11 @@ export default function GameLauncher() {
             <TitleBar runningGames={runningGamesInfo} onStopGame={handleStopGame} />
 
             <ScrollArea className="flex-1 mt-10">
-                <main className="mx-5 pb-5 overflow-hidden">
-                    <div className="container mx-auto px-4 py-6 max-w-4xl overflow-hidden">
+                <main className="mx-5 pb-5 overflow-hidden max-sm:mx-2 max-sm:pb-3">
+                    <div className="container mx-auto px-4 py-6 max-w-4xl overflow-hidden max-sm:px-2 max-sm:py-4">
 
                     {/* Search Bar */}
-                    <div className="flex gap-2 mb-6">
+                    <div className="flex gap-2 mb-6 max-sm:gap-1.5 max-sm:flex-wrap">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -280,16 +282,11 @@ export default function GameLauncher() {
                                 placeholder={t("search.placeholder")}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                className="pl-10 bg-background"
+                                className="pl-10 bg-background max-sm:h-9 max-sm:text-xs"
                                 disabled={isLoading}
                             />
                         </div>
-                        <Button onClick={handleSearch} disabled={isLoading}>
-                            <Search className="h-4 w-4 mr-2" />
-                            {t("search.button")}
-                        </Button>
-                        <Button variant="outline" onClick={handleRefresh} disabled={isLoading || isRefreshing} className="bg-background">
+                        <Button variant="outline" onClick={handleRefresh} disabled={isLoading || isRefreshing} className="bg-background whitespace-nowrap max-sm:h-9 max-sm:px-2 max-sm:text-xs">
                             {isRefreshing ? (
                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                             ) : (
@@ -407,13 +404,13 @@ export default function GameLauncher() {
                                     </Pagination>
 
                                     {/* Page Jump */}
-                                    <div className="flex items-center justify-center gap-2 text-sm">
+                                    <div className="flex items-center justify-center gap-2 text-sm max-sm:flex-wrap max-sm:text-xs">
                                         <span className="text-muted-foreground">{t("pagination.goToPage")}</span>
                                         <Input
                                             type="number"
                                             min={1}
                                             max={totalPages}
-                                            className="w-16 h-8 text-center"
+                                            className="w-16 h-8 text-center max-sm:h-7 max-sm:w-14 max-sm:text-xs"
                                             onKeyDown={(e) => {
                                                 if (e.key === "Enter") {
                                                     const value = parseInt((e.target as HTMLInputElement).value)
@@ -430,7 +427,7 @@ export default function GameLauncher() {
                             )}
 
                             {/* Footer */}
-                            <div className="mt-4 text-center text-sm text-muted-foreground">
+                            <div className="mt-4 text-center text-sm text-muted-foreground wrap-break-word max-sm:text-xs">
                                 {filteredGames.length > 0 ? (
                                     <>
                                         {favoriteGames.length > 0 && (

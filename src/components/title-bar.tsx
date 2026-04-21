@@ -269,16 +269,16 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
     return (
         <header
             data-tauri-drag-region
-            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-10 px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 select-none"
+            className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-10 px-4 bg-background/80 backdrop-blur-xl border-b border-border/50 select-none max-sm:px-2"
         >
             {/* Title */}
-            <div className="flex items-center gap-2 flex-1" data-tauri-drag-region>
+            <div className="flex items-center gap-2 flex-1 min-w-0" data-tauri-drag-region>
                 <img className="h-5 w-5 pointer-events-none" src="./icon.png" alt="App icon"/>
-                <span className="font-semibold text-sm text-foreground pointer-events-none">Disactivity</span>
+                <span className="font-semibold text-sm text-foreground pointer-events-none truncate max-sm:hidden">Disactivity</span>
             </div>
 
             <div
-                className="flex items-center gap-2 relative z-10"
+                className="flex items-center gap-2 relative z-10 max-sm:gap-1"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 style={{WebkitAppRegion: 'no-drag'} as React.CSSProperties}
@@ -287,7 +287,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                 {runningCount > 0 && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                            <Button variant="secondary" size="sm" className="h-8 gap-1.5 px-2">
+                            <Button variant="secondary" size="sm" className="h-8 gap-1.5 px-2 max-sm:h-7 max-sm:px-1.5">
                                 <SquareActivity className="h-4 w-4 text-green-500" />
                                 <span className="text-xs font-medium">{runningCount}</span>
                             </Button>
@@ -372,7 +372,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                                     variant="secondary"
                                     size="icon"
                                     onClick={handleUpdateButtonClick}
-                                    className="h-8 w-8"
+                                    className="h-8 w-8 max-sm:h-7 max-sm:w-7"
                                     disabled={updateState === "checking" || updateState === "downloading"}
                                 >
                                     {getUpdateButtonContent()}
@@ -385,7 +385,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                     </TooltipProvider>
                 )}
 
-                <Button variant="secondary" size="icon" onClick={toggleTheme} className="h-8 w-8">
+                <Button variant="secondary" size="icon" onClick={toggleTheme} className="h-8 w-8 max-sm:h-7 max-sm:w-7">
                     {isDark ? <Sun className="h-5 w-5"/> : <Moon className="h-5 w-5"/>}
                 </Button>
 
@@ -393,7 +393,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                 <button
                     onClick={handleMinimize}
                     onPointerDown={(e) => e.stopPropagation()}
-                    className="group w-5 h-3 rounded-full bg-[#FEBC2E] hover:bg-[#FEBC2E]/80 flex items-center justify-center transition-colors"
+                    className="group w-5 h-3 rounded-full bg-[#FEBC2E] hover:bg-[#FEBC2E]/80 flex items-center justify-center transition-colors max-sm:w-4"
                 >
                     {isHovered && (
                         <Minus className="w-2 h-2 text-[#995700] opacity-0 group-hover:opacity-100 transition-opacity"/>
@@ -404,7 +404,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                 <button
                     onClick={handleMaximize}
                     onPointerDown={(e) => e.stopPropagation()}
-                    className="group w-5 h-3 rounded-full bg-[#28C840] hover:bg-[#28C840]/80 flex items-center justify-center transition-colors"
+                    className="group w-5 h-3 rounded-full bg-[#28C840] hover:bg-[#28C840]/80 flex items-center justify-center transition-colors max-sm:w-4"
                 >
                     {isHovered && (
                         <Square
@@ -416,7 +416,7 @@ export function TitleBar({ runningGames = new Map(), onStopGame }: TitleBarProps
                 <button
                     onClick={handleClose}
                     onPointerDown={(e) => e.stopPropagation()}
-                    className="group w-5 h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF5F57]/80 flex items-center justify-center transition-colors"
+                    className="group w-5 h-3 rounded-full bg-[#FF5F57] hover:bg-[#FF5F57]/80 flex items-center justify-center transition-colors max-sm:w-4"
                 >
                     {isHovered &&
                         <X className="w-2 h-2 text-[#4A0002] opacity-0 group-hover:opacity-100 transition-opacity"/>}
