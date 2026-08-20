@@ -22,7 +22,13 @@
   "gameCard": {
     "running": "Ejecutando",
     "executables": "Ejecutables",
-    "id": "ID"
+    "id": "ID",
+    "steamFallback": {
+      "button": "Steam (experimental)",
+      "tooltip": "Discord no tiene un ejecutable de Windows conocido para este juego, pero lista un SKU de Steam. Esto escribe un appmanifest falso y una carpeta de instalación en tu biblioteca real de Steam, que Discord escanea directamente en busca de juegos instalados - pero solo al iniciarse. Tendrás que reiniciar Discord después de iniciar esto (con el juego falso aún en ejecución) para que lo detecte. Se te pedirá confirmar la carpeta de instalación y el nombre del ejecutable antes. Experimental.",
+      "promptInstalldir": "Nombre de la carpeta de instalación de \"{{name}}\" dentro de steamapps/common (edítalo si es incorrecto, o cancela para abortar):",
+      "promptExecutable": "Ruta del ejecutable de \"{{name}}\", relativa a su carpeta de instalación. Rellenado con la mejor opción - otras opciones a probar:\n{{candidates}}\n\n(edita el campo de abajo, o cancela para abortar)"
+    }
   },
   "pagination": {
     "previous": "Anterior",
@@ -65,6 +71,10 @@
     },
     "failedToStartGame": {
       "title": "Error al iniciar el juego"
+    },
+    "steamFallbackStarted": {
+      "title": "Reinicia Discord ahora",
+      "description": "Discord solo escanea tu biblioteca de Steam al iniciarse, no en tiempo real. Con el juego falso aún en ejecución, cierra Discord por completo (icono de la bandeja) y vuelve a abrirlo para que lo detecte."
     },
     "gameStopped": {
       "title": "Juego detenido",

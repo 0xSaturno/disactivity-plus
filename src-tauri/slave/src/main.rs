@@ -30,14 +30,20 @@ unsafe extern "system" fn wndproc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: 
 }
 
 fn main() {
+    // The launcher passes the real game title as the first argument so the
+    // window (and anything reading its title, e.g. Task Manager/Alt-Tab)
+    // shows the actual game name instead of the spoofed exe filename.
+    let display_title = env::args().nth(1).filter(|s| !s.trim().is_empty());
+
     let exe_path = env::current_exe().unwrap_or_default();
     let exe_name = Path::new(&exe_path)
         .file_stem()
         .and_then(|s| s.to_str())
-        .unwrap_or("DisactivitySlave");
+        .unwrap_or("DisactivitySlave")
+        .to_string();
 
     let class_name = to_wide_string("DisactivitySlaveClass");
-    let window_title = to_wide_string(exe_name);
+    let window_title = to_wide_string(&display_title.unwrap_or(exe_name));
 
     unsafe {
         let hinstance = GetModuleHandleW(null_mut());

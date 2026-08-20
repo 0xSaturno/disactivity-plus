@@ -134,6 +134,7 @@ export default function GameLauncher() {
         try {
             await invoke<string>("start_game", {
                 gameId: game.id,
+                gameName: game.name,
                 executables: game.executables,
                 selectedExecutable: selectedExecutable || null,
             })
@@ -142,6 +143,71 @@ export default function GameLauncher() {
             setGameStartTimes((prev) => new Map(prev).set(game.id, Date.now()))
             toast.success(t("toast.gameStarted.title"), {
                 description: t("toast.gameStarted.description", { name: game.name }),
+            })
+        } catch (error) {
+            toast.error(t("toast.failedToStartGame.title"), {
+                description: `${error}`,
+            })
+        } finally {
+            setLoadingGames((prev) => {
+                const next = new Set(prev)
+                next.delete(game.id)
+                return next
+            })
+        }
+    }
+
+    const handleStartGameViaSteam = async (game: Game, steamAppId: string) => {
+        setLoadingGames((prev) => new Set(prev).add(game.id))
+
+        try {
+            let installdir = ""
+            let candidates: string[] = []
+            try {
+                const guess = await invoke<{ installdir: string; candidates: string[] }>(
+                    "resolve_steam_launch_info",
+                    { steamAppId },
+                )
+                installdir = guess.installdir
+                candidates = guess.candidates
+            } catch (error) {
+                toast.error(t("toast.failedToStartGame.title"), {
+                    description: `${error}`,
+                })
+                return
+            }
+
+            const editedInstalldir = window.prompt(
+                t("gameCard.steamFallback.promptInstalldir", { name: game.name }),
+                installdir,
+            )
+            if (editedInstalldir === null) return
+
+            const candidateList = candidates.map((c, i) => `${i + 1}. ${c}`).join("\n")
+            const editedExecutable = window.prompt(
+                t("gameCard.steamFallback.promptExecutable", { name: game.name, candidates: candidateList }),
+                candidates[0] ?? "",
+            )
+            if (editedExecutable === null) return
+
+            await invoke<string>("start_game_via_steam", {
+                gameId: game.id,
+                gameName: game.name,
+                steamAppId,
+                installdir: editedInstalldir,
+                executable: editedExecutable,
+            })
+
+            setRunningGames((prev) => new Set(prev).add(game.id))
+            setGameStartTimes((prev) => new Map(prev).set(game.id, Date.now()))
+            toast.success(t("toast.gameStarted.title"), {
+                description: t("toast.gameStarted.description", { name: game.name }),
+            })
+            // Discord only scans installed Steam games at its own startup, not live -
+            // it needs a restart to notice the fake manifest, with the fake exe already running.
+            toast.info(t("toast.steamFallbackStarted.title"), {
+                description: t("toast.steamFallbackStarted.description"),
+                duration: 15000,
             })
         } catch (error) {
             toast.error(t("toast.failedToStartGame.title"), {
@@ -322,6 +388,7 @@ export default function GameLauncher() {
                                                 isFavorite={true}
                                                 startTime={gameStartTimes.get(game.id)}
                                                 onStart={handleStartGame}
+                                                onStartViaSteam={handleStartGameViaSteam}
                                                 onStop={handleStopGame}
                                                 onToggleFavorite={handleToggleFavorite}
                                             />
@@ -343,6 +410,7 @@ export default function GameLauncher() {
                                             isFavorite={favorites.has(game.id)}
                                             startTime={gameStartTimes.get(game.id)}
                                             onStart={handleStartGame}
+                                            onStartViaSteam={handleStartGameViaSteam}
                                             onStop={handleStopGame}
                                             onToggleFavorite={handleToggleFavorite}
                                         />

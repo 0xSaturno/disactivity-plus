@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
 import { Button } from "@/components/ui/button"
-import { Info, Play, Square, Loader2, Star, ChevronDown } from "lucide-react"
+import { Info, Play, Square, Loader2, Star, ChevronDown, FlaskConical } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import {
     DropdownMenu,
@@ -17,12 +17,22 @@ export interface Executable {
     os?: string
 }
 
+export interface ThirdPartySku {
+    distributor: string
+    id: string | null
+}
+
 export interface Game {
     id: string
     name: string
     icon_hash: string
     executables?: Executable[] | null
     aliases?: string[] | null
+    third_party_skus?: ThirdPartySku[] | null
+}
+
+export function getSteamAppId(game: Game): string | null {
+    return game.third_party_skus?.find((sku) => sku.distributor === "steam")?.id ?? null
 }
 
 interface GameCardProps {
@@ -32,6 +42,7 @@ interface GameCardProps {
     isFavorite: boolean
     startTime?: number
     onStart: (game: Game, selectedExecutable?: string) => void
+    onStartViaSteam: (game: Game, steamAppId: string) => void
     onStop: (gameId: string) => void
     onToggleFavorite: (gameId: string) => void
 }
@@ -55,7 +66,7 @@ function formatElapsedTime(ms: number): string {
     return `${pad(minutes)}:${pad(seconds)}`
 }
 
-export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, onStart, onStop, onToggleFavorite }: GameCardProps) {
+export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, onStart, onStartViaSteam, onStop, onToggleFavorite }: GameCardProps) {
     const { t } = useTranslation()
     const [elapsed, setElapsed] = useState(0)
 
@@ -77,13 +88,19 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
         (exe) => exe.os === "win32" && !exe.name.startsWith(">")
     )
     const hasMultipleExecutables = win32Executables.length > 1
+    const steamAppId = getSteamAppId(game)
+    const isSteamFallbackOnly = win32Executables.length === 0 && !!steamAppId
 
     const handleClick = () => {
         if (isRunning) {
             onStop(game.id)
-        } else {
-            onStart(game)
+            return
         }
+        if (isSteamFallbackOnly && steamAppId) {
+            onStartViaSteam(game, steamAppId)
+            return
+        }
+        onStart(game)
     }
 
     return (
@@ -187,22 +204,41 @@ export function GameCard({ game, isRunning, isLoading, isFavorite, startTime, on
             </TooltipProvider>
 
             <div className="flex shrink-0">
-                <Button
-                    size="sm"
-                    onClick={handleClick}
-                    className={`shrink-0 max-sm:h-8 max-sm:px-2 ${!isRunning && hasMultipleExecutables ? "rounded-r-none" : ""}`}
-                    variant={isRunning ? "destructive" : "default"}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                    ) : isRunning ? (
-                        <Square className="h-4 w-4 mr-1.5" />
-                    ) : (
-                        <Play className="h-4 w-4 mr-1.5" />
-                    )}
-                    <span className="max-[420px]:hidden">{isRunning ? t("actions.stop") : t("actions.run")}</span>
-                </Button>
+                <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                size="sm"
+                                onClick={handleClick}
+                                className={`shrink-0 max-sm:h-8 max-sm:px-2 ${!isRunning && hasMultipleExecutables ? "rounded-r-none" : ""}`}
+                                variant={isRunning ? "destructive" : isSteamFallbackOnly ? "outline" : "default"}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                                ) : isRunning ? (
+                                    <Square className="h-4 w-4 mr-1.5" />
+                                ) : isSteamFallbackOnly ? (
+                                    <FlaskConical className="h-4 w-4 mr-1.5" />
+                                ) : (
+                                    <Play className="h-4 w-4 mr-1.5" />
+                                )}
+                                <span className="max-[420px]:hidden">
+                                    {isRunning
+                                        ? t("actions.stop")
+                                        : isSteamFallbackOnly
+                                            ? t("gameCard.steamFallback.button")
+                                            : t("actions.run")}
+                                </span>
+                            </Button>
+                        </TooltipTrigger>
+                        {!isRunning && isSteamFallbackOnly && (
+                            <TooltipContent side="top" className="max-w-xs">
+                                {t("gameCard.steamFallback.tooltip")}
+                            </TooltipContent>
+                        )}
+                    </Tooltip>
+                </TooltipProvider>
                 {!isRunning && hasMultipleExecutables && (
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

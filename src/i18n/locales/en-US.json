@@ -22,7 +22,13 @@
   "gameCard": {
     "running": "Running",
     "executables": "Executables",
-    "id": "ID"
+    "id": "ID",
+    "steamFallback": {
+      "button": "Steam (experimental)",
+      "tooltip": "Discord has no known Windows executable for this game, but it lists a Steam SKU. This writes a fake appmanifest and install folder into your real Steam library, which Discord scans directly for installed games - but only at Discord's own startup. You'll need to restart Discord after starting this (with the fake game still running) for it to be detected. You'll be asked to confirm the install folder and executable name first. Experimental.",
+      "promptInstalldir": "Install folder name for \"{{name}}\" inside steamapps/common (edit if wrong, or cancel to abort):",
+      "promptExecutable": "Executable path for \"{{name}}\", relative to its install folder. Pre-filled with the top guess - other candidates worth trying:\n{{candidates}}\n\n(edit the field below, or cancel to abort)"
+    }
   },
   "pagination": {
     "previous": "Previous",
@@ -65,6 +71,10 @@
     },
     "failedToStartGame": {
       "title": "Failed to start game"
+    },
+    "steamFallbackStarted": {
+      "title": "Restart Discord now",
+      "description": "Discord only scans your Steam library at its own startup, not live. With the fake game still running, fully quit Discord (tray icon) and reopen it for detection to pick this up."
     },
     "gameStopped": {
       "title": "Game stopped",
